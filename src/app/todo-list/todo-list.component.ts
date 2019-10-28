@@ -11,11 +11,15 @@ import {TodoService} from '../todo.service';
 })
 export class TodoListComponent implements OnInit {
 
-  @Input() 
-  
-  private data: TodoListData;
-  
-  constructor(private todoService: TodoService) { 
+  @Input()
+  private data: TodoListData; //Current item of the TodoList
+  private titre: string;
+  private filtre: string = 'all';  //Used to see which elements must be seen either 'completed', 'active' or 'all'
+
+
+  constructor(private todoService: TodoService) {
+    todoService.getTodoListDataObserver().subscribe( tdl => this.data = tdl);
+    this.titre = this.data.label;
   }
 
   ngOnInit() {
@@ -29,4 +33,107 @@ export class TodoListComponent implements OnInit {
     return this.data ? this.data.items : [];
   }
 
+  /**
+   * Call the todoService function in order to create a new Todo in the Todolist with the given label
+   * @param label
+  */
+  appendItem(label: string) {
+    this.todoService.appendItems(
+      { label, isDone: false}
+    );
+  }
+
+  /**
+   * Set a label to the given state (done or undone)
+   * @param item
+   * @param label
+  */
+  itemDone(item: TodoItemData, done: boolean){
+    this.todoService.setItemsDone(done, item);
+  }
+
+  /**
+   * Set a label to an item
+   * @param item
+   * @param label
+  */
+  itemLabel(item: TodoItemData, label: string){
+    this.todoService.setItemsLabel(label, item);
+  }
+
+  /**
+   * Remove an item from the TodoList
+   * @param item
+  */
+  removeItem(item: TodoItemData){
+    this.todoService.removeItems(item);
+  }
+
+  /**
+   * Set an item to the oposite state (done => undone)
+   * @param item
+  */
+  checkItem(item: TodoItemData){
+    this.todoService.setItemsDone(!item.isDone, item);
+  }
+
+  /**
+   * Changes the filtre value
+  */
+  show(value){
+    this.filtre = value;
+  }
+
+  /**
+   * Count the remaining undone item. 
+  */
+  countItems():number{
+    return (this.data.items.length - this.data.items.filter(item=>item.isDone).length);
+  }
+
+  /**
+   * Delete the all Done item from data
+  */
+  deleteDone():void{
+    for(let Data in this.data.items)
+    {
+      if(this.data.items[Data].isDone)
+      {
+      this.removeItem(this.data.items[Data]);
+      this.deleteDone();
+      break;
+      }
+  }
+}
+
+  /**
+   * Set all the items inside the ToDoList to done
+  */
+  selectAll():void
+  {
+    for(let Data in this.data.items)
+    {
+      if(this.data.items[Data].isDone == false)
+      {
+        this.itemDone(this.data.items[Data],true);
+      }
+    }    
+  }
+
+  /**
+   * Checks if an item is asked, if so, he can be displayed
+   * @param data
+   */
+  isItemShown(data){
+    if(this.filtre==='all'){
+      return true;
+    }
+    if(this.filtre==='actives' && !data.isDone){
+      return true;
+    }
+    if(this.filtre==='completed' && data.isDone){
+      return true;
+    }
+    return false;
+  }
 }

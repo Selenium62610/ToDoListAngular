@@ -1,36 +1,102 @@
 <section class="todoapp">
-  <header class="header">
-    <h1>{{titre}}</h1>
-    <form>
-      <input  #newTodoInput
-              name        = "newTodoInput"
-              class       = "new-todo"
-              placeholder = "Que faire?"
-              autofocus />
-    </form>
-  </header>
-  <section class="main">
-    <input  class="toggle-all"
-            type="checkbox"
-            name="toggleAll"
-    />
-    <ul class="todo-list">
-    </ul>
+    <header class="header">
+      <h1>{{titre}}</h1>
+      <button class="Undoing"> undo </button>
+      <form (submit)="appendItem(newTodoInput.value)">
+        <input  #newTodoInput
+                name        = "newTodoInput"
+                class       = "new-todo"
+                placeholder = "Que faire?"
+                autofocus />
+      </form>
+    </header>
+    <section class="main">
+      <input  (click)="selectAll()"
+              class="toggle-all"
+              type="checkbox"
+              name="toggleAll"
+      />
+      <ul class="todo-list">
+          <ng-container *ngFor="let item of data.items">
+            <app-todo-item 
+            *ngIf="isItemShown(item)"
+            [data]="item"
+            ></app-todo-item>
+          </ng-container>
+        </ul> 
+
+       
+    </section>
+    <footer class="footer">
+      <span class="todo-count"><strong>{{countItems()}}</strong> restantes</span>
+      <ul class="filters">
+        <li>
+          <a class="filterAll" 
+          (click)="show('all')"
+          [class.selected] = "filter==='all'">Tous</a>
+        </li>
+        <li>
+          <a class="filterActives"
+          (click)="show('actives')"
+          [class.selected] = "filter==='actives'">Actifs</a>
+        </li>
+        <li>
+          <a class="filterCompleted" 
+          (click)="show('completed')"
+          [class.selected] = "filter==='completed'">Complétés</a>
+        </li>
+      </ul>
+      <button class="clear-completed" (click)="deleteDone()">Supprimer cochées</button>
+    </footer>
   </section>
-  <footer class="footer">
-    <span class="todo-count"><strong></strong> restantes</span>
-    <ul class="filters">
-      <li>
-        <a class="filterAll">Tous</a>
-      </li>
-      <li>
-        <a class="filterActives">Actifs</a>
-      </li>
-      <li>
-        <a class="filterCompleted">Complétés</a>
-      </li>
-    </ul>
-    <button class="clear-completed">Supprimer cochées</button>
-  </footer>
-</section>
-<hr/>
+  <hr/>
+  
+  <!--Version debug
+  <h2>debug V1</h2>
+  <ul>
+    <li *ngFor="let item of items">
+      {{item | json}}
+    </li>
+  </ul>
+  
+  <h2>debug V2</h2>
+  <ul>
+    <li *ngFor="let item of items">
+      <input type="checkbox" [ngModel]="item.isDone">
+      <label> {{item.label}}</label>
+      <pre>{{item | json}}</pre>
+    </li>
+  </ul>
+  <h2>debug V3</h2>
+  <ul>
+    <li *ngFor="let item of items">
+      <input type="checkbox" [ngModel]="item.isDone" (ngModelChange)="itemDone(item, $event)">
+      <label> {{item.label}}</label>
+      <pre>{{item | json}}</pre>
+    </li>
+  </ul>
+  
+  <h2>debug V4</h2>
+  <ul>
+    <li *ngFor="let item of items">
+      <input type="checkbox" [ngModel]="item.isDone" (ngModelChange)="itemDone(item, $event)">
+      <form (submit)="itemLabel(item, newLab.value)">
+        <input type="text" name="label" [ngModel]="item.label" #newLab>
+      </form>
+      <label> {{item.label}}</label>
+      <pre>{{item | json}}</pre>
+    </li>
+  </ul>
+  
+  <h2>debug V5</h2>
+  <ul>
+    <li *ngFor="let item of items">
+      <input type="checkbox" [ngModel]="item.isDone" (ngModelChange)="itemDone(item, $event)">
+      <form (submit)="itemLabel(item, newLab.value)">
+        <input type="text" name="label" [ngModel]="item.label" #newLab>
+      </form>
+      <button (click)="removeItem(item)">DELETE</button>
+      <label> {{item.label}}</label>
+      <pre>{{item | json}}</pre>
+    </li>
+  </ul>-->

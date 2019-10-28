@@ -14,6 +14,11 @@ export class TodoService {
     return this.todoListSubject.asObservable();
   }
 
+  getToDoListSubject()
+  {
+    return this.todoListSubject.value.items;
+  }
+
   setItemsLabel(label: string, ...items: TodoItemData[] ) {
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
@@ -29,12 +34,13 @@ export class TodoService {
       items: tdl.items.map( I => items.indexOf(I) === -1 ? I : ({label: I.label, isDone}) )
     });
   }
-
+//Ajoute un objet à la todoItempDate []
   appendItems( ...items: TodoItemData[] ) {
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
       label: tdl.label, // ou on peut écrire: ...tdl,
       items: [...tdl.items, ...items]
+      
     });
   }
 
