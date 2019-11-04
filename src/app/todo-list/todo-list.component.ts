@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {TodoListData} from '../dataTypes/TodoListData';
-import {TodoItemData} from '../dataTypes/TodoItemData';
-import {TodoService} from '../todo.service';
+import { TodoListData } from './../dataTypes/TodoListData';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { TodoItemData } from '../dataTypes/TodoItemData';
+import { TodoService } from '../todo.service';
 
 @Component({
   selector: 'app-todo-list',
@@ -13,6 +13,9 @@ export class TodoListComponent implements OnInit {
 
   @Input()
   private data: TodoListData; //Current item of the TodoList
+  private past: [TodoListData];
+
+  futur: Array<{todo: TodoItemData}> = [];
   private titre: string;
   private filtre: string = 'all';  //Used to see which elements must be seen either 'completed', 'active' or 'all'
 
@@ -95,6 +98,7 @@ export class TodoListComponent implements OnInit {
    * Delete the all Done item from data
   */
   deleteDone():void{
+    console.log(this.data)
     for(let Data in this.data.items)
     {
       if(this.data.items[Data].isDone)
@@ -103,8 +107,22 @@ export class TodoListComponent implements OnInit {
       this.deleteDone();
       break;
       }
+    }
   }
-}
+
+  saveCurrent():void{
+    this.todoService.appendFutur(this.data.items);
+  }
+
+  /**
+   * Delete all item from data et save the current TodoList in Futur[]
+  */
+ deleteAll():void{
+  for(let Data in this.data.items){
+    this.removeItem(this.data.items[Data]);
+    this.deleteAll();
+  }
+}  
 
   /**
    * Set all the items inside the ToDoList to done
@@ -135,5 +153,36 @@ export class TodoListComponent implements OnInit {
       return true;
     }
     return false;
+  }
+
+  undo()
+  {
+    let lengthVoulu = this.todoService.empList.length;
+    lengthVoulu = lengthVoulu -1;
+    console.log("L'empList :",this.todoService.empList);
+    if(this.todoService.empList!=null) //Faudrait le claquer dans le futur[]
+    {
+      this.saveCurrent();
+      this.deleteAll();
+    }
+
+    for(let Data in this.todoService.empList[lengthVoulu])
+    {
+      this.todoService.appendItems(this.todoService.empList[lengthVoulu][Data]);
+    }
+
+  }
+
+  redo()
+  {
+    let lengthVoulu = this.todoService.future.length;
+    lengthVoulu = lengthVoulu-1;
+    console.log("LE FUUUUUTUUUUR : ", this.todoService.future);
+    for(let Data in this.todoService.future[lengthVoulu])
+    {
+      this.todoService.appendItems(this.todoService.future[lengthVoulu][Data]);
+    }
+    
+
   }
 }

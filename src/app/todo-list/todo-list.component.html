@@ -1,7 +1,8 @@
 <section class="todoapp">
     <header class="header">
       <h1>{{titre}}</h1>
-      <button class="Undoing"> undo </button>
+      <button class="Undoing" (click)="undo()"> undo </button>
+      <button class="Redoing" (click)="redo()"> redo </button>
       <form (submit)="appendItem(newTodoInput.value)">
         <input  #newTodoInput
                 name        = "newTodoInput"
