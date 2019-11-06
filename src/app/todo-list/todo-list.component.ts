@@ -26,6 +26,19 @@ export class TodoListComponent implements OnInit {
   }
 
   ngOnInit() {
+    //Récupérer les trucs dans le localStorage
+    if(localStorage.length > 0)
+    {
+      console.log("Le premier item sant le parse : ",localStorage.getItem("item 1"));
+      console.log("Le premier item avec le parse : ",JSON.parse(localStorage.getItem("item 1")));
+      for(let i=0; i < localStorage.length; i++){
+        let key = localStorage.key(i);
+        let item = JSON.parse(localStorage.getItem(key));
+        console.log("l'item : ",item[0]);
+        this.todoService.appendItems(item[0]);
+      }
+    }
+    console.log("LocalStorage vide? : " , localStorage);
   }
 
   get label(): string {
@@ -103,9 +116,11 @@ export class TodoListComponent implements OnInit {
     {
       if(this.data.items[Data].isDone)
       {
-      this.removeItem(this.data.items[Data]);
-      this.deleteDone();
-      break;
+        console.log("J'envoie : ", this.data.items[Data]);
+        this.todoService.removeLocalStorage(this.data.items[Data]);
+        this.removeItem(this.data.items[Data]);
+        this.deleteDone();
+        break;
       }
     }
   }

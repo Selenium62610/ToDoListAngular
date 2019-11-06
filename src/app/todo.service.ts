@@ -8,7 +8,6 @@ export class TodoService {
   empList: Array<{todo: TodoItemData}> = [];
   future: Array<{todo: TodoItemData}> = [];
   private todoListSubject = new BehaviorSubject<TodoListData>( {label: 'TodoList', items: []} );
-
   constructor() { }
 
   getTodoListDataObserver(): Observable<TodoListData> {
@@ -35,26 +34,32 @@ export class TodoService {
       items: tdl.items.map( I => items.indexOf(I) === -1 ? I : ({label: I.label, isDone}) )
     });
   }
+
+  //addToLocal storage
+  addToLocal(items: TodoItemData[])
+  {
+    localStorage.setItem(items[0].label , JSON.stringify(items));
+  }
   
+  removeLocalStorage(items)
+  {
+    console.log("je recois un : ", items);
+    console.log("Coucou je dois enlever : " , items.label );
+    localStorage.removeItem(items.label);
+  }
+
 //Ajoute un objet à la todoItempDate []
   appendItems( ...items: TodoItemData[] ) {
-  console.log("le this.todoListSubject.value.items : ",this.todoListSubject.value);
   if(this.todoListSubject.value.items.length != 0)
     {
       this.empList.push(this.todoListSubject.value.items);
-      console.log("Ce qu'il y'a dans this.past : ", this.empList );
-      
-      for(let Data in this.empList)
-      {
-        console.log("Le premier item : " , this.empList[Data])
-      }
     }
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
       label: tdl.label, // ou on peut écrire: ...tdl,
-      items: [...tdl.items, ...items]
-      
+      items: [...tdl.items, ...items]      
     });
+    this.addToLocal(items);
   }
 
   appendFutur(...items: TodoItemData[]){
@@ -81,6 +86,8 @@ export class TodoService {
 
   removeItems( ...items: TodoItemData[] ) {
     const tdl = this.todoListSubject.getValue();
+    console.log(items);
+    this.removeLocalStorage(items[0]);
     this.todoListSubject.next( {
       label: tdl.label, // ou on peut écrire: ...tdl,
       items: tdl.items.filter( I => items.indexOf(I) === -1 )
