@@ -1,5 +1,5 @@
 import { TodoListData } from './../dataTypes/TodoListData';
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { TodoItemData } from '../dataTypes/TodoItemData';
 import { TodoService } from '../todo.service';
 
@@ -12,6 +12,7 @@ import { TodoService } from '../todo.service';
 export class TodoListComponent implements OnInit {
 
   @Input()
+  @ViewChild('newTodoInput') redel:ElementRef;
   private data: TodoListData; //Current item of the TodoList
   private past: [TodoListData];
 
@@ -34,11 +35,9 @@ export class TodoListComponent implements OnInit {
       for(let i=0; i < localStorage.length; i++){
         let key = localStorage.key(i);
         let item = JSON.parse(localStorage.getItem(key));
-        console.log("l'item : ",item[0]);
         this.todoService.appendItems(item[0]);
       }
     }
-    console.log("LocalStorage vide? : " , localStorage);
   }
 
   get label(): string {
@@ -57,6 +56,8 @@ export class TodoListComponent implements OnInit {
     this.todoService.appendItems(
       { label, isDone: false}
     );
+  //Get rid of the text when we enter a new object
+  this.redel.nativeElement.value="";
   }
 
   /**

@@ -27,6 +27,11 @@ export class TodoService {
     });
   }
 
+  /**
+   * Set an item to the selected state
+   * @param isDone
+   * @param items
+  */
   setItemsDone(isDone: boolean, ...items: TodoItemData[] ) {
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
@@ -35,20 +40,27 @@ export class TodoService {
     });
   }
 
-  //addToLocal storage
+  /**
+   * Add an item to the LocalStorage with it's label as key 
+  */
   addToLocal(items: TodoItemData[])
   {
     localStorage.setItem(items[0].label , JSON.stringify(items));
   }
   
+
+  /**
+   * Delete an item from the LocalStorage using it's key to find it back
+   * @param items
+  */
   removeLocalStorage(items)
   {
-    console.log("je recois un : ", items);
-    console.log("Coucou je dois enlever : " , items.label );
     localStorage.removeItem(items.label);
   }
 
-//Ajoute un objet à la todoItempDate []
+  /**
+   * Add an item to the TodoItemData and to the list in order to undo
+  */
   appendItems( ...items: TodoItemData[] ) {
   if(this.todoListSubject.value.items.length != 0)
     {
@@ -62,6 +74,9 @@ export class TodoService {
     this.addToLocal(items);
   }
 
+  /**
+   * Add the current items to the future List
+  */
   appendFutur(...items: TodoItemData[]){
     if(this.todoListSubject.value.items.length != 0)
     {
