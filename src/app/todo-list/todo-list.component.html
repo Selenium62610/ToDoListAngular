@@ -1,6 +1,14 @@
 <section class="todoapp">
     <header class="header">
-      <h1>{{titre}}</h1>
+      <h1 [class.editing] = "showTest" (dblclick)= "showTest = true" *ngIf="!showTest" >{{data.label}}</h1>
+      <form (submit)="showTest = false">
+        <input  #newTextInput
+                name    = "newTextInput"
+                class   = "edit"
+                [(ngModel)]="data.label"
+                (blur)="showTest = false"
+                *ngIf="showTest"/>
+      </form>
       <button class="Undoing" (click)="undo()"> undo </button>
       <button class="Redoing" (click)="redo()"> redo </button>
       <form (submit)="appendItem(newTodoInput.value)">
@@ -11,6 +19,9 @@
                 autofocus />
       </form>
     </header>
+
+    
+
     <section class="main">
       <input  (click)="selectAll()"
               class="toggle-all"

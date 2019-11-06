@@ -10,9 +10,10 @@ import {ChangeDetectionStrategy, Component, OnInit, Input, Output} from '@angula
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodoItemComponent implements OnInit {
-
+  
   @Input() private data: TodoItemData; //present TodoList
   @Output() checkAction = new EventEmitter();   //event emitted when item is checked
+  
 
   public showEdit:boolean = false;  //true: show the edit input
 

@@ -53,9 +53,12 @@ export class TodoListComponent implements OnInit {
    * @param label
   */
   appendItem(label: string) {
-    this.todoService.appendItems(
-      { label, isDone: false}
-    );
+    if(label.length!=0)
+    {
+      this.todoService.appendItems(
+        { label, isDone: false}
+      );
+    }
   //Get rid of the text when we enter a new object
   this.redel.nativeElement.value="";
   }
@@ -201,4 +204,9 @@ export class TodoListComponent implements OnInit {
     
 
   }
+
+  TitreTruc(){
+    this.titre="Toast";
+  }
+
 }

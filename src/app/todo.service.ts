@@ -91,7 +91,6 @@ export class TodoService {
       label: tdl.label, // ou on peut écrire: ...tdl,
       items: [...tdl.items, ...items]
     });
-    console.log("Le tdl après rundo : ",tdl);
   }
 
   checkToDoListSubject()
@@ -101,7 +100,6 @@ export class TodoService {
 
   removeItems( ...items: TodoItemData[] ) {
     const tdl = this.todoListSubject.getValue();
-    console.log(items);
     this.removeLocalStorage(items[0]);
     this.todoListSubject.next( {
       label: tdl.label, // ou on peut écrire: ...tdl,
