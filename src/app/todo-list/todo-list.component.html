@@ -19,9 +19,6 @@
                 autofocus />
       </form>
     </header>
-
-    
-
     <section class="main">
       <input  (click)="selectAll()"
               class="toggle-all"
@@ -30,18 +27,24 @@
       />
       <ul class="todo-list">
           <ng-container *ngFor="let item of data.items">
-            <app-todo-item 
-            *ngIf="isItemShown(item)"
-            [data]="item"
+            <app-todo-item
+              *ngIf="isItemShown(item)"
+              [data]="item"
+              (renameAction)="rename($event)"
             ></app-todo-item>
           </ng-container>
-        </ul> 
-
-       
+        </ul>
     </section>
     <footer class="footer">
       <span class="todo-count"><strong>{{countItems()}}</strong> restantes</span>
       <ul class="filters">
+        
+        <li>
+          <a class="vocal"
+          (click)="activateSpeechSearchMovie()"
+          >record Vocal</a>
+        </li>
+
         <li>
           <a class="filterAll" 
           (click)="show('all')"
@@ -63,53 +66,3 @@
     </footer>
   </section>
   <hr/>
-  
-  <!--Version debug
-  <h2>debug V1</h2>
-  <ul>
-    <li *ngFor="let item of items">
-      {{item | json}}
-    </li>
-  </ul>
-  
-  <h2>debug V2</h2>
-  <ul>
-    <li *ngFor="let item of items">
-      <input type="checkbox" [ngModel]="item.isDone">
-      <label> {{item.label}}</label>
-      <pre>{{item | json}}</pre>
-    </li>
-  </ul>
-  <h2>debug V3</h2>
-  <ul>
-    <li *ngFor="let item of items">
-      <input type="checkbox" [ngModel]="item.isDone" (ngModelChange)="itemDone(item, $event)">
-      <label> {{item.label}}</label>
-      <pre>{{item | json}}</pre>
-    </li>
-  </ul>
-  
-  <h2>debug V4</h2>
-  <ul>
-    <li *ngFor="let item of items">
-      <input type="checkbox" [ngModel]="item.isDone" (ngModelChange)="itemDone(item, $event)">
-      <form (submit)="itemLabel(item, newLab.value)">
-        <input type="text" name="label" [ngModel]="item.label" #newLab>
-      </form>
-      <label> {{item.label}}</label>
-      <pre>{{item | json}}</pre>
-    </li>
-  </ul>
-  
-  <h2>debug V5</h2>
-  <ul>
-    <li *ngFor="let item of items">
-      <input type="checkbox" [ngModel]="item.isDone" (ngModelChange)="itemDone(item, $event)">
-      <form (submit)="itemLabel(item, newLab.value)">
-        <input type="text" name="label" [ngModel]="item.label" #newLab>
-      </form>
-      <button (click)="removeItem(item)">DELETE</button>
-      <label> {{item.label}}</label>
-      <pre>{{item | json}}</pre>
-    </li>
-  </ul>-->

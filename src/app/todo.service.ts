@@ -1,22 +1,17 @@
 import { Injectable } from '@angular/core';
-import {TodoListData} from './dataTypes/TodoListData';
-import {Observable, BehaviorSubject} from 'rxjs';
-import {TodoItemData} from './dataTypes/TodoItemData';
+import { TodoListData } from './dataTypes/TodoListData';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { TodoItemData } from './dataTypes/TodoItemData';
 
 @Injectable()
 export class TodoService {
   empList: Array<{todo: TodoItemData}> = [];
   future: Array<{todo: TodoItemData}> = [];
   private todoListSubject = new BehaviorSubject<TodoListData>( {label: 'TodoList', items: []} );
-  constructor() { }
+  constructor() {}
 
   getTodoListDataObserver(): Observable<TodoListData> {
     return this.todoListSubject.asObservable();
-  }
-
-  getToDoListSubject()
-  {
-    return this.todoListSubject.value.items;
   }
 
   setItemsLabel(label: string, ...items: TodoItemData[] ) {
@@ -33,6 +28,7 @@ export class TodoService {
    * @param items
   */
   setItemsDone(isDone: boolean, ...items: TodoItemData[] ) {
+    console.log("setItemsDone: ",items);
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
       label: tdl.label,
@@ -41,41 +37,26 @@ export class TodoService {
   }
 
   /**
-   * Add an item to the LocalStorage with it's label as key 
-  */
-  addToLocal(items: TodoItemData[])
-  {
-    localStorage.setItem(items[0].label , JSON.stringify(items));
-  }
-  
-
-  /**
-   * Delete an item from the LocalStorage using it's key to find it back
+   * Add an item to the TodoItemData and to the list in order to undo requestAnimationrame(() => this.input.nativeElement.focus());
    * @param items
-  */
-  removeLocalStorage(items)
-  {
-    localStorage.removeItem(items.label);
-  }
-
-  /**
-   * Add an item to the TodoItemData and to the list in order to undo
-  */
+   */
   appendItems( ...items: TodoItemData[] ) {
   if(this.todoListSubject.value.items.length != 0)
     {
       this.empList.push(this.todoListSubject.value.items);
     }
+
+    console.log("après");
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
       label: tdl.label, // ou on peut écrire: ...tdl,
       items: [...tdl.items, ...items]      
     });
-    this.addToLocal(items);
   }
 
   /**
    * Add the current items to the future List
+   * @param items
   */
   appendFutur(...items: TodoItemData[]){
     if(this.todoListSubject.value.items.length != 0)
@@ -93,18 +74,20 @@ export class TodoService {
     });
   }
 
-  checkToDoListSubject()
-  {
-
-  }
-
   removeItems( ...items: TodoItemData[] ) {
     const tdl = this.todoListSubject.getValue();
-    this.removeLocalStorage(items[0]);
+    //this.removeLocalStorage(items[0]);
     this.todoListSubject.next( {
       label: tdl.label, // ou on peut écrire: ...tdl,
       items: tdl.items.filter( I => items.indexOf(I) === -1 )
     });
+  }
+
+  save()
+  {
+    const tdl = this.todoListSubject.getValue();
+    console.log(tdl.items)
+    localStorage.setItem(tdl.label, JSON.stringify(tdl.items));
   }
 
 }

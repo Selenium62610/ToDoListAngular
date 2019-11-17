@@ -1,7 +1,9 @@
+import { SpeechRecognitionService } from './../speech-recognition.service';
 import { TodoListData } from './../dataTypes/TodoListData';
-import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild, ElementRef, OnDestroy, EventEmitter } from '@angular/core';
 import { TodoItemData } from '../dataTypes/TodoItemData';
 import { TodoService } from '../todo.service';
+
 
 @Component({
   selector: 'app-todo-list',
@@ -9,35 +11,43 @@ import { TodoService } from '../todo.service';
   styleUrls: ['./todo-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TodoListComponent implements OnInit {
+export class TodoListComponent implements OnInit,OnDestroy {
+
+  showSearchButton : boolean;
+  speechData : string;
 
   @Input()
-  @ViewChild('newTodoInput') redel:ElementRef;
-  private data: TodoListData; //Current item of the TodoList
-  private past: [TodoListData];
+  @ViewChild('newTodoInput', {static:false}) todoInput:any;
 
+  private data: TodoListData; //Current item of the TodoList 
   futur: Array<{todo: TodoItemData}> = [];
   private titre: string;
   private filtre: string = 'all';  //Used to see which elements must be seen either 'completed', 'active' or 'all'
 
-
-  constructor(private todoService: TodoService) {
+  constructor(private todoService: TodoService , private speechRecognitionService:SpeechRecognitionService) {
     todoService.getTodoListDataObserver().subscribe( tdl => this.data = tdl);
     this.titre = this.data.label;
+    this.showSearchButton = true;
+    this.speechData = '';
   }
 
   ngOnInit() {
-    //Récupérer les trucs dans le localStorage
-    if(localStorage.length > 0)
-    {
-      console.log("Le premier item sant le parse : ",localStorage.getItem("item 1"));
-      console.log("Le premier item avec le parse : ",JSON.parse(localStorage.getItem("item 1")));
-      for(let i=0; i < localStorage.length; i++){
-        let key = localStorage.key(i);
-        let item = JSON.parse(localStorage.getItem(key));
-        this.todoService.appendItems(item[0]);
-      }
-    }
+    //Loads the stored todolist
+    this.loadTodoListLocal();
+
+    //Update data each time the todolist changes
+    this.todoService.getTodoListDataObserver().subscribe(todolist=>{
+      //Retrieve the todolist data
+      this.data = todolist;
+      this.titre = todolist.label;
+
+      //Save the todolist in local storage
+      this.saveTodoListLocal();
+    });
+  }
+
+  ngOnDestroy(){
+    this.speechRecognitionService.DestroySpeechObject();
   }
 
   get label(): string {
@@ -55,12 +65,13 @@ export class TodoListComponent implements OnInit {
   appendItem(label: string) {
     if(label.length!=0)
     {
+      console.log("att");
       this.todoService.appendItems(
         { label, isDone: false}
       );
     }
   //Get rid of the text when we enter a new object
-  this.redel.nativeElement.value="";
+  //this.redel.nativeElement.value="";
   }
 
   /**
@@ -120,7 +131,6 @@ export class TodoListComponent implements OnInit {
     {
       if(this.data.items[Data].isDone)
       {
-        console.log("J'envoie : ", this.data.items[Data]);
         this.todoService.removeLocalStorage(this.data.items[Data]);
         this.removeItem(this.data.items[Data]);
         this.deleteDone();
@@ -205,8 +215,59 @@ export class TodoListComponent implements OnInit {
 
   }
 
-  TitreTruc(){
-    this.titre="Toast";
+  /**
+   * Loads the todolist in localstorage
+   */
+  loadTodoListLocal(){
+    console.log("Le load");
+    if(localStorage.getItem('todolist')){
+      let localList:TodoListData = JSON.parse(localStorage.getItem('todolist'));
+      this.todoService.setItemsLabel(localList.label);
+      localList.items.forEach(item=>{
+        this.todoService.appendItems(item);
+      });  
+    }
   }
+
+  /**
+   * Save the todolist in localstorage
+   */
+  saveTodoListLocal(){
+    console.log('dans save');
+    localStorage.setItem('todolist', JSON.stringify(this.data));
+  }
+
+  rename(item: TodoItemData)
+  {
+    this.todoService.setItemsLabel(item.label, item);
+  }
+
+
+
+  activateSpeechSearchMovie(): void {
+    this.showSearchButton = false;
+    this.speechRecognitionService.record()
+        .subscribe(
+        //listener
+        (value) => {
+            this.speechData = value;
+            console.log(value);
+        },
+        //errror
+        (err) => {
+            console.log(err);
+            if (err.error == "no-speech") {
+                console.log("--restatring service--");
+                this.activateSpeechSearchMovie();
+            }
+        },
+        //completion
+        () => {
+            this.showSearchButton = true;
+            console.log("--complete--");
+            this.activateSpeechSearchMovie();
+        });
+      
+}
 
 }

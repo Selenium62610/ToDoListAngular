@@ -3,8 +3,8 @@
     <input 	class			= "toggle"
             type			= "checkbox"
             [ngModel] = "data.isDone"
-            (checked) = "datadone($event)"
             (ngModelChange)="datadone($event)"
+            (click) = "checkAction.emit(data)" 
     />
 
     <label  class     = "texte"
@@ -22,6 +22,7 @@
             class   = "edit"
             [(ngModel)]="data.label"
             (blur)="showEdit = false"
+            (change)="renameAction.emit(data)"
             *ngIf="showEdit"
             autofocus/>
   </form>

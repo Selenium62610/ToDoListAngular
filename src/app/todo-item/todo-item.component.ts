@@ -11,16 +11,14 @@ import {ChangeDetectionStrategy, Component, OnInit, Input, Output} from '@angula
 })
 export class TodoItemComponent implements OnInit {
   
-  @Input() private data: TodoItemData; //present TodoList
+  @Input() data:TodoItemData; //present TodoList
   @Output() checkAction = new EventEmitter();   //event emitted when item is checked
+  @Output() renameAction = new EventEmitter();
   
 
   public showEdit:boolean = false;  //true: show the edit input
 
   constructor(private todoService: TodoService) { }
-
-  ngOnInit() {
-  }
 
   get label():string {
     return this.data.label;
@@ -28,6 +26,7 @@ export class TodoItemComponent implements OnInit {
 
   remove(): void
   {
+    console.log("remove");  
     this.todoService.removeItems(this.data);
   }
 
@@ -36,4 +35,8 @@ export class TodoItemComponent implements OnInit {
     this.todoService.setItemsDone(event, this.data);
   }
 
+  updateLabel()
+  {
+    this.todoService.save()
+  }
 }
