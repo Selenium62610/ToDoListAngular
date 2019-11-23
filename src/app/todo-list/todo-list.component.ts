@@ -35,6 +35,8 @@ export class TodoListComponent implements OnInit,OnDestroy {
     //Loads the stored todolist
     this.loadTodoListLocal();
 
+    console.log("dans l'emplit",this.todoService.empList);
+
     //Update data each time the todolist changes
     this.todoService.getTodoListDataObserver().subscribe(todolist=>{
       //Retrieve the todolist data
@@ -44,6 +46,9 @@ export class TodoListComponent implements OnInit,OnDestroy {
       //Save the todolist in local storage
       this.saveTodoListLocal();
     });
+    this.todoService.clearHistory();
+    console.log(this.todoService.nbUndo);
+    
   }
 
   ngOnDestroy(){
@@ -65,10 +70,10 @@ export class TodoListComponent implements OnInit,OnDestroy {
   appendItem(label: string) {
     if(label.length!=0)
     {
-      console.log("att");
       this.todoService.appendItems(
         { label, isDone: false}
       );
+    this.todoInput.nativeElement.value = "";
     }
   //Get rid of the text when we enter a new object
   //this.redel.nativeElement.value="";
@@ -126,7 +131,6 @@ export class TodoListComponent implements OnInit,OnDestroy {
    * Delete the all Done item from data
   */
   deleteDone():void{
-    console.log(this.data)
     for(let Data in this.data.items)
     {
       if(this.data.items[Data].isDone)
@@ -186,40 +190,67 @@ export class TodoListComponent implements OnInit,OnDestroy {
 
   undo()
   {
-    let lengthVoulu = this.todoService.empList.length;
-    lengthVoulu = lengthVoulu -1;
-    console.log("L'empList :",this.todoService.empList);
-    if(this.todoService.empList!=null) //Faudrait le claquer dans le futur[]
+    console.log("l'empList que je vais utiliser: ", this.todoService.empList)
+    if(this.todoService.nbUndo <0)
     {
-      this.saveCurrent();
-      this.deleteAll();
-    }
+      let lengthVoulu = this.todoService.empList.length;
+      lengthVoulu = lengthVoulu -1;
+      console.log("L'empList de undo :",this.todoService.empList);
+      if(this.todoService.empList!=null) //Faudrait le claquer dans le futur[]
+      {
+        this.saveCurrent();
+        this.deleteAll();
+      }
 
-    for(let Data in this.todoService.empList[lengthVoulu])
+      for(let Data in this.todoService.empList[lengthVoulu])
+      {
+        this.todoService.appendItemsSpecial(this.todoService.empList[lengthVoulu][Data]);
+      }
+    this.todoService.nbUndo+=1;
+    this.todoService.nbRedo-=1;
+    console.log(this.todoService.nbUndo);
+    this.todoService.empList.pop();
+    console.log("L'empList de undo après le .pop():",this.todoService.empList);
+    console.log("Ce qu'il y'a dans me future: " ,this.todoService.future );
+    }
+    else
     {
-      this.todoService.appendItems(this.todoService.empList[lengthVoulu][Data]);
+      alert("Impossible nbUndo = 0 ");
     }
 
   }
 
   redo()
   {
-    let lengthVoulu = this.todoService.future.length;
-    lengthVoulu = lengthVoulu-1;
-    console.log("LE FUUUUUTUUUUR : ", this.todoService.future);
-    for(let Data in this.todoService.future[lengthVoulu])
+    if(this.todoService.nbRedo <0)
     {
-      this.todoService.appendItems(this.todoService.future[lengthVoulu][Data]);
-    }
-    
+      this.todoService.putInReserve(this.data);
+      this.deleteAll();
+      let lengthVoulu = this.todoService.future.length;
+      lengthVoulu = lengthVoulu-1;
+      console.log("LE FUUUUUTUUUUR : ", this.todoService.future);
+      for(let Data in this.todoService.future[lengthVoulu])
+      {
+        this.todoService.appendItemsSpecial(this.todoService.future[lengthVoulu][Data]);
+      }
+      this.todoService.nbRedo+=1;
+      this.todoService.nbUndo-=1;
+      this.todoService.future.pop();
 
+      console.log("Valeur de l'empList: ", this.todoService.empList);
+      console.log("Valeur de Future: ", this.todoService.future);
+      
+    }
+    else
+    {
+      alert("Impossible nbUndo = 0 ");
+    }
   }
 
   /**
    * Loads the todolist in localstorage
    */
   loadTodoListLocal(){
-    console.log("Le load");
     if(localStorage.getItem('todolist')){
       let localList:TodoListData = JSON.parse(localStorage.getItem('todolist'));
       this.todoService.setItemsLabel(localList.label);
@@ -233,7 +264,6 @@ export class TodoListComponent implements OnInit,OnDestroy {
    * Save the todolist in localstorage
    */
   saveTodoListLocal(){
-    console.log('dans save');
     localStorage.setItem('todolist', JSON.stringify(this.data));
   }
 
@@ -251,7 +281,7 @@ export class TodoListComponent implements OnInit,OnDestroy {
         //listener
         (value) => {
             this.speechData = value;
-            console.log(value);
+            console.log('La valeur du speechData :  ',value);
         },
         //errror
         (err) => {

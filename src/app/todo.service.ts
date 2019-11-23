@@ -7,14 +7,20 @@ import { TodoItemData } from './dataTypes/TodoItemData';
 export class TodoService {
   empList: Array<{todo: TodoItemData}> = [];
   future: Array<{todo: TodoItemData}> = [];
+  public nbUndo:number=0;
+  public nbRedo:number=0;
   private todoListSubject = new BehaviorSubject<TodoListData>( {label: 'TodoList', items: []} );
   constructor() {}
 
   getTodoListDataObserver(): Observable<TodoListData> {
     return this.todoListSubject.asObservable();
   }
-
-  setItemsLabel(label: string, ...items: TodoItemData[] ) {
+/**
+ * 
+ * @param label 
+ * @param items 
+ */
+  setItemsLabel(label: string, ...items: TodoItemData[] ) {    
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
       label: tdl.label,
@@ -28,7 +34,6 @@ export class TodoService {
    * @param items
   */
   setItemsDone(isDone: boolean, ...items: TodoItemData[] ) {
-    console.log("setItemsDone: ",items);
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
       label: tdl.label,
@@ -44,14 +49,32 @@ export class TodoService {
   if(this.todoListSubject.value.items.length != 0)
     {
       this.empList.push(this.todoListSubject.value.items);
+      this.nbUndo-=1;
     }
-
-    console.log("après");
     const tdl = this.todoListSubject.getValue();
     this.todoListSubject.next( {
       label: tdl.label, // ou on peut écrire: ...tdl,
       items: [...tdl.items, ...items]      
     });
+  }
+
+  putInReserve(...items: TodoItemData[])
+  {
+    if(this.todoListSubject.value.items.length != 0)
+    {
+      this.empList.push(this.todoListSubject.value.items);
+    }
+    console.log("dans le putInReserve l'empList :", this.empList);
+  }
+
+  appendItemsSpecial( ...items: TodoItemData[] ) {
+      console.log("appendItemsSpecial");
+      const tdl = this.todoListSubject.getValue();
+      this.todoListSubject.next( {
+        label: tdl.label, // ou on peut écrire: ...tdl,
+        items: [...tdl.items, ...items]      
+      });
+      console.log("Contenu dans empList de appendItemsSpecial: ", this.empList);
   }
 
   /**
@@ -86,8 +109,16 @@ export class TodoService {
   save()
   {
     const tdl = this.todoListSubject.getValue();
-    console.log(tdl.items)
     localStorage.setItem(tdl.label, JSON.stringify(tdl.items));
+  }
+
+  clearHistory()
+  {
+    for(let i=0; i<=this.empList.length; i++)
+    {
+      this.empList.pop();
+    }
+  this.nbUndo = 0;
   }
 
 }
