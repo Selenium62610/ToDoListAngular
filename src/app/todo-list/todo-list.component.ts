@@ -35,20 +35,15 @@ export class TodoListComponent implements OnInit,OnDestroy {
     //Loads the stored todolist
     this.loadTodoListLocal();
 
-    console.log("dans l'emplit",this.todoService.empList);
-
     //Update data each time the todolist changes
     this.todoService.getTodoListDataObserver().subscribe(todolist=>{
       //Retrieve the todolist data
       this.data = todolist;
-      this.titre = todolist.label;
 
       //Save the todolist in local storage
       this.saveTodoListLocal();
     });
     this.todoService.clearHistory();
-    console.log(this.todoService.nbUndo);
-    
   }
 
   ngOnDestroy(){
@@ -143,6 +138,9 @@ export class TodoListComponent implements OnInit,OnDestroy {
     }
   }
 
+  /**
+   * 
+   */
   saveCurrent():void{
     this.todoService.appendFutur(this.data.items);
   }
@@ -188,15 +186,17 @@ export class TodoListComponent implements OnInit,OnDestroy {
     return false;
   }
 
+  /**
+   * Check if undo is possible if so save the current in a array for the redo and display the latest update from before, and delete this update from the array
+   */
   undo()
   {
-    console.log("l'empList que je vais utiliser: ", this.todoService.empList)
+    //Si aucun Undo n'est possible le bouton Undo ne fait rien
     if(this.todoService.nbUndo <0)
     {
       let lengthVoulu = this.todoService.empList.length;
       lengthVoulu = lengthVoulu -1;
-      console.log("L'empList de undo :",this.todoService.empList);
-      if(this.todoService.empList!=null) //Faudrait le claquer dans le futur[]
+      if(this.todoService.empList!=null)
       {
         this.saveCurrent();
         this.deleteAll();
@@ -206,20 +206,16 @@ export class TodoListComponent implements OnInit,OnDestroy {
       {
         this.todoService.appendItemsSpecial(this.todoService.empList[lengthVoulu][Data]);
       }
-    this.todoService.nbUndo+=1;
-    this.todoService.nbRedo-=1;
-    console.log(this.todoService.nbUndo);
-    this.todoService.empList.pop();
-    console.log("L'empList de undo après le .pop():",this.todoService.empList);
-    console.log("Ce qu'il y'a dans me future: " ,this.todoService.future );
+      //On met à jour les différents compteurs
+      this.todoService.nbUndo+=1;
+      this.todoService.nbRedo-=1;
+      this.todoService.empList.pop();
     }
-    else
-    {
-      alert("Impossible nbUndo = 0 ");
-    }
-
   }
 
+  /**
+   * Check if we can redo if possible save the current todoList, delete the TodoList and display the last update, modify the redo,undo comptor and delete the last update from the data base
+   */
   redo()
   {
     if(this.todoService.nbRedo <0)
@@ -228,7 +224,6 @@ export class TodoListComponent implements OnInit,OnDestroy {
       this.deleteAll();
       let lengthVoulu = this.todoService.future.length;
       lengthVoulu = lengthVoulu-1;
-      console.log("LE FUUUUUTUUUUR : ", this.todoService.future);
       for(let Data in this.todoService.future[lengthVoulu])
       {
         this.todoService.appendItemsSpecial(this.todoService.future[lengthVoulu][Data]);
@@ -236,14 +231,6 @@ export class TodoListComponent implements OnInit,OnDestroy {
       this.todoService.nbRedo+=1;
       this.todoService.nbUndo-=1;
       this.todoService.future.pop();
-
-      console.log("Valeur de l'empList: ", this.todoService.empList);
-      console.log("Valeur de Future: ", this.todoService.future);
-      
-    }
-    else
-    {
-      alert("Impossible nbUndo = 0 ");
     }
   }
 
@@ -267,13 +254,18 @@ export class TodoListComponent implements OnInit,OnDestroy {
     localStorage.setItem('todolist', JSON.stringify(this.data));
   }
 
+  /**
+   * Call the todoService in order to update the localStorage by sending the renamed todo
+   * @param item 
+   */
   rename(item: TodoItemData)
   {
     this.todoService.setItemsLabel(item.label, item);
   }
 
-
-
+  /**
+   * Display the text said by the user but it doesn't add it to the todolist yet
+   */
   activateSpeechSearchMovie(): void {
     this.showSearchButton = false;
     this.speechRecognitionService.record()
@@ -299,5 +291,4 @@ export class TodoListComponent implements OnInit,OnDestroy {
         });
       
 }
-
 }
