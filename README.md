@@ -1,25 +1,28 @@
 # MIASHS-M2-TP3-Projet
 
-## Development server
+## Installation et lancement
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Pour récupérer la dernière version et lancer l'application il faudra éxécuter les commandes suivantes:
+```
+git clone https://github.com/Selenium62610/ToDoListAngular/tree/master
+npm install
+ng serve
+```
 
-## Code scaffolding
+## Fonctionnalités ajoutés
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Sérialisation / désérialisation des données localement (local storage)
+- Effacer tout.
+- Changement de titre.
+- Changer les différents filtres.
+- Undo/Redo qui s'actualise aussi avec les modifications de label et d'étâts.
+- Tentative de remplir la liste par vocal (Récuperation simple de la parole).
+- Lors de l'entrée d'une nouvelle tâche le champs se vide.
 
-## Build
+## Problèmes rencontrés
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+Lors du premier démarrage de l'application celle ci peut ne pas compiler, mais étrangement si l'on modifie un fichier et qu'on lui redonne sa forme d'origine, la compilation fonctionne.
 
-## Running unit tests
+## Plugin
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Utilisation du plugin SpeechRecognitionService afin de pouvoir enregistrer la voix de l'utilisateur et potentiellement ajouter des tâches a la TodoList
