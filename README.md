@@ -23,6 +23,8 @@ ng serve
 
 Lors du premier démarrage de l'application celle ci peut ne pas compiler, mais étrangement si l'on modifie un fichier et qu'on lui redonne sa forme d'origine, la compilation fonctionne.
 
+Lors de commit de différents projet, une erreur d'inatention à dû avoir lieux ce qui à provoqué la création d'une nouvelle branche et pas mal de soucis. 
+
 ## Plugin
 
 Utilisation du plugin SpeechRecognitionService afin de pouvoir enregistrer la voix de l'utilisateur et potentiellement ajouter des tâches a la TodoList
